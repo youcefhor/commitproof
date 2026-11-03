@@ -1,0 +1,262 @@
+{
+  "agent": "verified",
+  "passed": 8,
+  "total": 8,
+  "cases": [
+    {
+      "case": "normal",
+      "passed": true,
+      "claims": [
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    },
+    {
+      "case": "network failure before commit",
+      "passed": true,
+      "claims": [
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": "before"
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    },
+    {
+      "case": "response lost after commit",
+      "passed": true,
+      "claims": [
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": "after"
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    },
+    {
+      "case": "HTTP 200 with rejected operation",
+      "passed": true,
+      "claims": [
+        "denied"
+      ],
+      "expected_orders": [],
+      "observed_orders": [],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": "rejected"
+        }
+      ]
+    },
+    {
+      "case": "outside return window",
+      "passed": true,
+      "claims": [
+        "denied"
+      ],
+      "expected_orders": [],
+      "observed_orders": [],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        }
+      ]
+    },
+    {
+      "case": "duplicate user request",
+      "passed": true,
+      "claims": [
+        "completed",
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    },
+    {
+      "case": "wrong order acknowledged",
+      "passed": true,
+      "claims": [
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": "wrong"
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "repair_wrong_order",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    },
+    {
+      "case": "database transaction rolled back",
+      "passed": true,
+      "claims": [
+        "completed"
+      ],
+      "expected_orders": [
+        "A-100"
+      ],
+      "observed_orders": [
+        "A-100"
+      ],
+      "trace": [
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": "rollback"
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        },
+        {
+          "call": "request_return",
+          "order": "A-100",
+          "request": "request-001",
+          "fault": null
+        },
+        {
+          "call": "read_return",
+          "request": "request-001"
+        }
+      ]
+    }
+  ]
+}
