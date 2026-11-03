@@ -1,4 +1,8 @@
-# CommitProof
+# CommitProof Guard
+
+Protect agent tools from redispatch after an ambiguous failure. If a refund
+commits and the worker crashes before seeing the reply, the guard blocks a
+second dispatch under the same key. Run `python -m unittest -v` to reproduce.
 
 **Did your agent finish the job, or just say it did?**
 
@@ -19,7 +23,7 @@ python -m unittest -v
 
 The optimistic baseline exits with code 1 intentionally. Use the verified
 baseline for a passing CI example. See the generated JSON reports in
-`examples/` for the expected orders, observed orders, claims, and tool trace.
+the repository root for the expected orders, observed orders, claims, and tool trace.
 
 ## Connect your own agent
 
@@ -44,3 +48,40 @@ Create a repository named `commitproof`. Upload the contents of this folder
 with the README at the root. Include the hidden `.github/workflows` folder
 to run the benchmark on pushes and pull requests. Open the resulting
 Actions run to see the tests. The included license is MIT.
+
+## Durable dispatch guard
+
+`guard.Journal` is a separate runtime component for tools that mutate external
+state. It writes an intent to SQLite before dispatching a tool, records the
+result, and replays that result when the caller retries with the same operation
+key and arguments. If the process dies between dispatch and recording the
+result, the key remains uncertain and retries raise `Uncertain`. Use an
+independent provider lookup or a human operator to resolve that state.
+
+```python
+from guard import Journal
+
+journal = Journal("operations.sqlite")
+result = journal.execute(
+    "refund-request-42", "refund", {"amount": 12},
+    lambda key, args: {"receipt": key, "amount": args["amount"]},
+)
+```
+
+Run `python -m unittest -v`. The crash test starts an independent process,
+commits a simulated refund to a separate provider database, and terminates
+before the result reaches the journal. The restarted worker checks the original
+operation key. A separate test overlaps two requests to check that only one
+can dispatch.
+
+Use a stable key from the application before calling an agent. This guard is
+for trusted workers sharing a durable SQLite file on one host. The application
+must supply reconciliation, authentication and storage protection. Requests
+that fail before reaching the provider also remain uncertain. The guard cannot
+prevent a caller using a different key, a provider executing one request twice,
+or changes outside the journal. The benchmark uses simulated providers and
+rule-based agents. No external model scores or production claims are included.
+
+See [Stripe's idempotency design](https://stripe.com/blog/idempotency) for
+provider-side guarantees and [τ-bench scoring](https://github.com/sierra-research/tau2-bench/blob/main/docs/evaluation.md)
+for database-state evaluation of agents.
