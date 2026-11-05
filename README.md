@@ -2,7 +2,7 @@
 
 **Check an agent's completion claim against what actually committed.**
 
-[العربية](README.ar.md) · [Walkthrough video](https://github.com/youcefhor/youcefhor/blob/main/assets/commitproof-demo.mp4) · [Guard implementation](guard.py) · [Example report](verified.json)
+[العربية](README.ar.md) · [Walkthrough video](https://github.com/user-attachments/assets/a04472d2-38b7-4002-b45b-7bd0af986b77) · [Guard implementation](guard.py) · [Example report](verified.json)
 
 ![CommitProof reference results](https://raw.githubusercontent.com/youcefhor/youcefhor/main/assets/commitproof-cover.png)
 
@@ -14,9 +14,11 @@ CommitProof runs those cases against isolated SQLite databases. It checks the fi
 
 ## See it run
 
+https://github.com/user-attachments/assets/a04472d2-38b7-4002-b45b-7bd0af986b77
+
 ![Replay of actual command output](https://raw.githubusercontent.com/youcefhor/youcefhor/main/assets/commitproof-demo.gif)
 
-[Watch or download the MP4 walkthrough](https://github.com/youcefhor/youcefhor/blob/main/assets/commitproof-demo.mp4)
+[Watch or download the MP4 walkthrough](https://github.com/user-attachments/assets/a04472d2-38b7-4002-b45b-7bd0af986b77)
 
 The visual replays output from a local run of this repository on 5 November 2026. The included optimistic baseline passed **3/8** scenarios. The verified baseline passed **8/8**. Six unit tests passed. These results cover the supplied deterministic store and reference agents.
 
