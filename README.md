@@ -1,29 +1,53 @@
-# CommitProof Guard
+# CommitProof
 
-Protect agent tools from redispatch after an ambiguous failure. If a refund
-commits and the worker crashes before seeing the reply, the guard blocks a
-second dispatch under the same key. Run `python -m unittest -v` to reproduce.
+**Check an agent's completion claim against what actually committed.**
 
-**Did your agent finish the job, or just say it did?**
+[العربية](README.ar.md) · [Walkthrough video](https://github.com/youcefhor/youcefhor/blob/main/assets/commitproof-demo.mp4) · [Guard implementation](guard.py) · [Example report](verified.json)
 
-CommitProof checks a return-processing agent against the contents of a real,
-isolated SQLite database. It injects deterministic failures before and after a
-write, including a timeout after commit, rejection with an OK transport
-response, rollback, duplicate requests, and misrouted writes.
+![CommitProof reference results](https://raw.githubusercontent.com/youcefhor/youcefhor/main/assets/commitproof-cover.png)
 
-## Reproduce locally
+## The failure this reproduces
 
-Requires Python 3.10 or newer. No packages, accounts, network, or API keys.
+A tool can write the right record and still time out before its caller sees the response. A blind retry may send the operation twice. A successful HTTP response can also hide a rejected operation or a write to the wrong record.
+
+CommitProof runs those cases against isolated SQLite databases. It checks the final record IDs as well as the agent's completion status. The separate dispatch guard records intent before calling a write tool and stops redispatch when the outcome is uncertain.
+
+## See it run
+
+![Replay of actual command output](https://raw.githubusercontent.com/youcefhor/youcefhor/main/assets/commitproof-demo.gif)
+
+[Watch or download the MP4 walkthrough](https://github.com/youcefhor/youcefhor/blob/main/assets/commitproof-demo.mp4)
+
+The visual replays output from a local run of this repository on 5 November 2026. The included optimistic baseline passed **3/8** scenarios. The verified baseline passed **8/8**. Six unit tests passed. These results cover the supplied deterministic store and reference agents.
+
+## Try it
+
+Requires Python 3.10 or newer and the standard library.
 
 ```sh
+git clone https://github.com/youcefhor/commitproof.git
+cd commitproof
 python commitproof.py --agent optimistic --report optimistic.json
 python commitproof.py --agent verified --report verified.json
 python -m unittest -v
 ```
 
-The optimistic baseline exits with code 1 intentionally. Use the verified
-baseline for a passing CI example. See the generated JSON reports in
-the repository root for the expected orders, observed orders, claims, and tool trace.
+The optimistic baseline intentionally exits with code 1 when a false completion is detected.
+
+## Repository map
+
+| File | Role |
+| --- | --- |
+| [commitproof.py](commitproof.py) | Store, failure scenarios, evaluator and CLI |
+| [guard.py](guard.py) | Durable dispatch journal and uncertain-outcome guard |
+| [test_commitproof.py](test_commitproof.py) | Completion-claim regression tests |
+| [test_guard.py](test_guard.py) | Crash recovery, concurrency and replay tests |
+| [optimistic.json](optimistic.json) / [verified.json](verified.json) | Reproducible reference reports |
+
+## Implementation and integration notes
+
+<details>
+<summary>Adapters, dispatch guard and operating assumptions</summary>
 
 ## Connect your own agent
 
@@ -42,12 +66,6 @@ rule-based reference agents. It measures behavior on this suite only. The
 adapter executes in-process, so run only trusted adapters. No commercial
 agent or external model has been benchmarked in the included reports.
 
-## Publishing
-
-Create a repository named `commitproof`. Upload the contents of this folder
-with the README at the root. Include the hidden `.github/workflows` folder
-to run the benchmark on pushes and pull requests. Open the resulting
-Actions run to see the tests. The included license is MIT.
 
 ## Durable dispatch guard
 
@@ -85,3 +103,7 @@ rule-based agents. No external model scores or production claims are included.
 See [Stripe's idempotency design](https://stripe.com/blog/idempotency) for
 provider-side guarantees and [τ-bench scoring](https://github.com/sierra-research/tau2-bench/blob/main/docs/evaluation.md)
 for database-state evaluation of agents.
+
+
+</details>
+
